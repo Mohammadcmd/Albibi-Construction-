@@ -2,6 +2,10 @@
 publish = "theme"
 command = "npm run build"
 
+[functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+
 [[headers]]
 for = "/*" # This defines which paths this specific [[headers]] block will cover.
 
@@ -10,3 +14,11 @@ X-Frame-Options = "DENY"
 X-XSS-Protection = "1; mode=block"
 Referrer-Policy = "same-origin"
 Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+[[headers]]
+for = "/app/*"
+
+[headers.values]
+X-Robots-Tag = "noindex, nofollow"
+X-Content-Type-Options = "nosniff"
+Permissions-Policy = "microphone=(self), camera=(), geolocation=()"
