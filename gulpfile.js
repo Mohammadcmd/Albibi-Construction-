@@ -19,6 +19,7 @@ var path = {
     js: "source/js/*.js",
     scss: "source/scss/**/*.scss",
     images: "source/images/**/*.+(png|jpg|gif|svg)",
+    app: "source/app/**/*.*",
   },
   build: {
     dirBuild: "theme/",
@@ -123,6 +124,18 @@ gulp.task("plugins:build", function () {
     );
 });
 
+// Office assistant web app (copied as-is, no templating)
+gulp.task("app:build", function () {
+  return gulp
+    .src(path.src.app)
+    .pipe(gulp.dest(path.build.dirDev + "app/"))
+    .pipe(
+      bs.reload({
+        stream: true,
+      })
+    );
+});
+
 // Other files like favicon, php, sourcele-icon on root directory
 gulp.task("others:build", function () {
   return gulp.src(path.src.others).pipe(gulp.dest(path.build.dirDev));
@@ -141,6 +154,7 @@ gulp.task("watch:build", function () {
   gulp.watch(path.src.js, gulp.series("js:build"));
   gulp.watch(path.src.images, gulp.series("images:build"));
   gulp.watch(path.src.plugins, gulp.series("plugins:build"));
+  gulp.watch(path.src.app, gulp.series("app:build"));
 });
 
 // Dev Task
@@ -153,6 +167,7 @@ gulp.task(
     "scss:build",
     "images:build",
     "plugins:build",
+    "app:build",
     "others:build",
     gulp.parallel("watch:build", function () {
       bs.init({
@@ -172,6 +187,7 @@ gulp.task(
     "js:build",
     "scss:build",
     "images:build",
-    "plugins:build"
+    "plugins:build",
+    "app:build"
   )
 );

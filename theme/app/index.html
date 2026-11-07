@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1b2a3a">
+  <title>Albibi Office Assistant</title>
+  <link rel="icon" href="/images/favicon.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <!-- Sign in -->
+  <main id="login" class="login" hidden>
+    <div class="login-card">
+      <div class="brand-mark">AC</div>
+      <h1>Albibi Office Assistant</h1>
+      <p class="muted">Invoices, estimates and bills - just tell it what you did.</p>
+
+      <form id="login-email">
+        <label for="username">Work email</label>
+        <div class="email-field">
+          <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="john.smith" required>
+          <span>@albibiconstruction.com</span>
+        </div>
+        <button class="btn primary wide" type="submit">Send me a code</button>
+      </form>
+
+      <form id="login-code" hidden>
+        <p>We emailed a 6-digit code to <strong id="code-email"></strong>.</p>
+        <label for="code">Verification code</label>
+        <input id="code" name="code" class="code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="------" required>
+        <button class="btn primary wide" type="submit">Sign in</button>
+        <div class="row-links">
+          <button type="button" class="link" id="resend">Resend code</button>
+          <button type="button" class="link" id="change-email">Use a different email</button>
+        </div>
+      </form>
+      <p id="login-error" class="error" role="alert"></p>
+    </div>
+  </main>
+
+  <!-- App -->
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark sm">AC</span><span class="brand-name">Albibi Office</span></div>
+      <div class="top-actions">
+        <div class="menu">
+          <button class="btn ghost" id="new-btn" aria-haspopup="true" aria-expanded="false">+ New</button>
+          <div class="menu-list" id="new-menu" hidden>
+            <button data-new="invoice">Invoice</button>
+            <button data-new="estimate">Estimate</button>
+            <button data-new="bill">Bill</button>
+          </div>
+        </div>
+        <button class="btn ghost" id="history-btn">History</button>
+        <div class="menu">
+          <button class="btn ghost user-btn" id="user-btn" aria-haspopup="true" aria-expanded="false"><span id="user-email"></span></button>
+          <div class="menu-list right" id="user-menu" hidden>
+            <button id="logout">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="View">
+      <button class="tab active" data-tab="chat">Chat</button>
+      <button class="tab" data-tab="preview">Document <span class="badge" id="preview-badge" hidden></span></button>
+    </nav>
+
+    <div class="workspace">
+      <section class="chat panel active" data-panel="chat" aria-label="Assistant">
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="suggestions" id="suggestions">
+          <button>Invoice for Mike Johnson, 45 Oak Ave - tore out the old deck for $850, 3 days carpentry at $600/day, lumber was $4,235.50</button>
+          <button>Estimate for a kitchen remodel at 12 Pine St for Sarah Lee: cabinets $8,500, countertops $3,200, labor $6,000</button>
+          <button>Bill ABC Properties for drywall repair at their Main St unit, 2 hours at $85/hr plus $60 materials, due in 15 days</button>
+        </div>
+        <form class="composer" id="composer">
+          <button type="button" class="icon-btn" id="mic" title="Speak" aria-label="Speak" hidden>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+          </button>
+          <textarea id="input" rows="1" placeholder="Tell me about the job - who, where, what you did, prices..." aria-label="Message"></textarea>
+          <button type="submit" class="btn primary" id="send">Send</button>
+        </form>
+      </section>
+
+      <section class="preview panel" data-panel="preview" aria-label="Document preview">
+        <div class="preview-toolbar">
+          <button class="btn ghost sm" id="undo" disabled>Undo</button>
+          <span class="spacer"></span>
+          <button class="btn primary" id="make-pdf">Create PDF</button>
+        </div>
+        <div class="share-bar" id="share-bar" hidden>
+          <button class="btn" id="share">Share / Text</button>
+          <button class="btn" id="email">Email to customer</button>
+          <button class="btn" id="download">Download</button>
+          <button class="btn" id="open-pdf">Open</button>
+        </div>
+        <div class="paper" id="paper"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- History -->
+  <dialog id="history-dialog" class="dialog">
+    <div class="dialog-head"><h2>Recent documents</h2><button class="icon-btn" data-close aria-label="Close">&times;</button></div>
+    <div id="history-list" class="history-list"></div>
+  </dialog>
+
+  <!-- Email -->
+  <dialog id="email-dialog" class="dialog">
+    <form id="email-form" method="dialog">
+      <div class="dialog-head"><h2>Email PDF</h2><button type="button" class="icon-btn" data-close aria-label="Close">&times;</button></div>
+      <label for="email-to">To</label>
+      <input id="email-to" type="text" inputmode="email" placeholder="customer@example.com" required>
+      <label for="email-cc">CC <span class="muted">(optional)</span></label>
+      <input id="email-cc" type="text" inputmode="email" placeholder="">
+      <label for="email-message">Message <span class="muted">(optional - a standard note is used if blank)</span></label>
+      <textarea id="email-message" rows="5"></textarea>
+      <p class="muted small">Replies will come to <span id="reply-to"></span>.</p>
+      <p class="error" id="email-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="email-send">Send email</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
